@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b64c8eea-80c4-47aa-bfbc-2aca1cf3ab69" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="calculator-mule-applicationFlow" doc:id="8ee43aa3-a97c-447d-b957-cdc7f3110cad" >
+		<http:listener doc:name="Listener" doc:id="c68b733e-1546-4988-b44e-99551f6ffe0f" config-ref="HTTP_Listener_config" path="/calculator" allowedMethods="GET"/>
+		<set-variable value="#[attributes.queryParams.firstNumber]" doc:name="Set Variable" doc:id="143992eb-d149-4e72-9052-86ee5bba6781" variableName="firstNumber"/>
+		<set-variable value="#[attributes.queryParams.secondNumber]" doc:name="Set Variable" doc:id="fa5941ef-774f-443d-b233-57236f840644" variableName="secondNumber"/>
+		<set-variable value="#[attributes.queryParams.operation]" doc:name="Set Variable" doc:id="828590e6-b476-4b0e-9d15-9fb9557728d4" variableName="operation"/>
+		<choice doc:name="Choice" doc:id="7f5d6ddf-2140-40cc-99b6-9c637bfe69e1" >
+			<when expression='#[vars.operation == "Addition"]'>
+				<set-payload value="#[vars.firstNumber as Number + vars.secondNumber as Number]" doc:name="Set Payload" doc:id="3213ca74-aa65-4330-879c-125bb45d72eb" />
+				<ee:transform doc:name="Transform Message" doc:id="63f4215d-beae-4107-a63e-5d1d7d684f99" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.operation =="subtraction"]'>
+				<set-payload doc:name="Set Payload" doc:id="39d5dec8-509f-4c9d-b1c2-4a50fadf7dc3" value="#[vars.firstNumber as Number - vars.secondNumber as Number]"/>
+				<ee:transform doc:name="Transform Message" doc:id="c9513781-a55d-4eb2-a48b-8509374943ab" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.operation == "multiplication"]'>
+				<set-payload value="#[vars.firstNumber as Number * vars.secondNumber as Number]" doc:name="Set Payload" doc:id="bd05f181-fc13-4ad6-a594-61813151db3a" />
+				<ee:transform doc:name="Transform Message" doc:id="a1b3e783-0c59-4b3c-8ef6-a62fb3e39c0b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.operation == "division"]'>
+				<set-payload value="#[vars.firstNumber as Number / vars.secondNumber as Number]" doc:name="Set Payload" doc:id="d1d4b535-3fa7-4f8d-b31c-754fe1205d9e" />
+				<ee:transform doc:name="Transform Message" doc:id="536c772b-6d61-467e-98d2-cc9ba449f140" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<set-payload value="it is not define" doc:name="Set Payload" doc:id="72ae148b-8174-4b90-a9c3-1e9032f288cc" />
+				<ee:transform doc:name="Transform Message" doc:id="eef6c581-d9f2-4a7e-b862-a09a587a2312" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
